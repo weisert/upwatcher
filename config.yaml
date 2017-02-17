@@ -1,0 +1,15 @@
+# desired paths in repository
+
+paths:
+    - 'base'
+    - 'media'
+
+# path to the working copy
+
+path_to_copy: '/home/weisert/projects/chromium/src'
+
+# list of recipients for digest
+
+recipients:
+    - 'igor.weisert@gmail.com'
+    - 'weisert@yandex-team.ru'

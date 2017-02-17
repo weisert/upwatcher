@@ -1,0 +1,4 @@
+dominate==2.3.1
+py==1.4.32
+pytest==3.0.6
+PyYAML==3.12
