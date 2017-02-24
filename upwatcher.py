@@ -1,9 +1,13 @@
 #!/usr/bin/env python
 
 import os
+import smtplib
 import StringIO
 import subprocess
 import yaml
+
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 import dominate
 from dominate.tags import *
@@ -125,6 +129,19 @@ def pull_changes(src):
     subprocess.check_call(cmd, shell=False)
 
 
+def send(from_address, to_address, html):
+    part = MIMEText(html, 'html')
+    msg = MIMEMultipart('alternative')
+    msg['Subject'] = 'Chromium digest'
+    msg['From'] = from_address
+    msg['To'] = to_address
+    msg.attach(part)
+
+    smtp = smtplib.SMTP('localhost')
+    smtp.sendmail(from_address, to_address, msg.as_string())
+    smtp.quit()
+
+
 def main():
     current_dir = os.path.dirname(os.path.abspath(__file__))
     config = get_config(os.path.join(current_dir, 'config.yaml'))
@@ -132,8 +149,9 @@ def main():
         return 1
     pull_changes(config['path_to_copy'])
     history = get_recent_history(config['path_to_copy'], config['paths'])
-    with open('/Users/weisert/Desktop/untitled.html', 'w') as f:
-        f.write(create_html_document(history))
+    digest = create_html_document(history)
+    for address in config['recipients']:
+        send(config['mail_from'], address, digest)
     return 0
 
 

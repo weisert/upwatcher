@@ -8,6 +8,10 @@ paths:
 
 path_to_copy: '/home/weisert/projects/chromium/src'
 
+# digest author
+
+mail_from: 'weisert@yandex-team.ru'
+
 # list of recipients for digest
 
 recipients:
