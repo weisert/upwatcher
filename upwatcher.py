@@ -13,54 +13,50 @@ __email__ = 'igor.weisert@gmail.com'
 
 
 def create_html_document(data):
-    bootstrap = 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/'
-    bottom_script = '''
-    $( document ).ready(function() {
-        $('.expand-collapse').click(function () {
-            var button = $(this);
-            var panel = button.closest('.cl-panel');
-            var content = panel.find('.cl-content');
-            if (content.is(':hidden')) {
-                button.html('Collapse');
-            } else {
-                button.html('Expand');
-            }
-            content.slideToggle('fast');
-        });
-    });'''
     doc = dominate.document()
     with doc.head:
-        link(rel='stylesheet',
-             href=bootstrap + 'css/bootstrap.min.css',
-             integrity='sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u',
-             crossorigin='anonymous')
-        link(rel='stylesheet',
-             href=bootstrap + 'css/bootstrap-theme.min.css',
-             integrity='sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp',
-             crossorigin='anonymous')
-        script(src='https://code.jquery.com/jquery-3.1.1.min.js',
-               integrity='sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=',
-               crossorigin='anonymous')
-        script(src=bootstrap + 'js/bootstrap.min.js',
-               integrity='sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa',
-               crossorigin='anonymous')
+        title("Chromium digest")
+        style('''
+    h1 {
+      text-align: center;
+      vertical-align: middle;
+      background-color: #E0E0E0;
+      border-radius: 5px;
+    }
+    .main {}
+    @media screen and (min-width: 800px) {
+      .main {
+        margin-left: 10%;
+        margin-right: 10%;
+      }
+    }
+    .commit {
+      margin-bottom: 5px;
+      background-color: white;
+      border: 2px solid grey;
+      border-radius: 5px;
+    }
+    .commit-header {
+      text-align: center;
+      vertical-align: middle;
+      background-color: #E8E8E8;
+      margin: 1%;
+      border-radius: 3px;
+    }
+    .commit-description {
+      margin: 1%;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    ''', type="text/css")
     with doc.body:
-        with div(cls='container', style='padding-top: 10px;'):
+        with div(cls='main'):
+            h1('Chromium digest')
             for item in data:
-                with div(cls='panel panel-default cl-panel'):
-                    with div(cls='panel-heading clearfix'):
-                        h4(item['head'], cls='panel-title pull-left',
-                           style='padding-top: 7.5px;')
-                        with div(cls="btn-group pull-right"):
-                            a('Expand',
-                              cls='btn btn-info btn-sm expand-collapse')
-                            a('View CL', target='_blank',
-                              cls='btn btn-success btn-sm',
-                              href=item['url'])
-                    with div(cls='panel panel-body cl-content',
-                             style='display:none;'):
-                        pre(item['commit_message'])
-        script(bottom_script, type='text/javascript')
+                with div(cls='commit'):
+                    with a(href=item['url'], target='_blank'):
+                        h2(item['head'], cls='commit-header')
+                    pre(item['commit_message'], cls='commit-description')
     return str(doc)
 
 
