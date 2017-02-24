@@ -1,0 +1,1 @@
+15 8 * * * cd /home/weisert && source upwatcher_env/bin/activate && upwatcher/upwatcher.py

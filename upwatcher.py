@@ -16,6 +16,9 @@ __author__ = 'Igor Vayzert'
 __email__ = 'igor.weisert@gmail.com'
 
 
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
 def create_html_document(data):
     doc = dominate.document()
     with doc.head:
@@ -87,13 +90,12 @@ def get_recent_history(src, paths):
     :parameter paths - list of interested paths
     '''
     cmd = ['git', 'log', '-m']
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    last_commit_file = os.path.join(current_dir, '.last_commit')
+    last_commit_file = os.path.join(CURRENT_DIR, '.last_commit')
     if os.path.exists(last_commit_file):
         with open(last_commit_file) as f:
             cmd.append(f.read() + '..HEAD')
     else:
-        cmd.append('--since=\'last 2 months\'')
+        cmd.append('--since=\'last 2 weeks\'')
     cmd.extend(['--pretty=format:"%H"', '--'])
     cmd.extend(paths)
     os.chdir(src)
@@ -143,8 +145,7 @@ def send(from_address, to_address, html):
 
 
 def main():
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    config = get_config(os.path.join(current_dir, 'config.yaml'))
+    config = get_config(os.path.join(CURRENT_DIR, 'config.yaml'))
     if get_current_branch(config['path_to_copy']) != 'master':
         return 1
     pull_changes(config['path_to_copy'])
