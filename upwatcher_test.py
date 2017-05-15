@@ -18,7 +18,7 @@ Date:   Tue Jan 31 20:59:55 2017 -0800
 
     BUG=internal b/34631886
 
-    Review-Url: https://codereview.chromium.org/2659133003
+    Review-Url: https://codereview.chromium.org/2659133003 .
     Cr-Commit-Position: refs/heads/master@{#447451}
 
     '''

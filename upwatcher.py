@@ -5,6 +5,7 @@ import smtplib
 import StringIO
 import subprocess
 import yaml
+import re
 
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -20,54 +21,31 @@ CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 def create_html_document(data):
+    h1_style = 'text-align: center; vertical-align: middle;' \
+               ' background-color: #E0E0E0; border-radius: 5px;'
+    commit_style = 'margin-bottom: 5px; background-color: white;' \
+                   ' border: 2px solid grey; border-radius: 5px;'
+    commit_header_style = 'text-align: center; vertical-align: middle;' \
+                          ' background-color: #E8E8E8; margin: 1%;' \
+                          ' border-radius: 3px;'
+    commit_description_style = 'margin: 1%; border-radius: 3px;' \
+                               ' overflow: hidden;'
     doc = dominate.document()
-    with doc.head:
-        title("Chromium digest")
-        style('''
-    h1 {
-      text-align: center;
-      vertical-align: middle;
-      background-color: #E0E0E0;
-      border-radius: 5px;
-    }
-    .main {}
-    @media screen and (min-width: 800px) {
-      .main {
-        margin-left: 10%;
-        margin-right: 10%;
-      }
-    }
-    .commit {
-      margin-bottom: 5px;
-      background-color: white;
-      border: 2px solid grey;
-      border-radius: 5px;
-    }
-    .commit-header {
-      text-align: center;
-      vertical-align: middle;
-      background-color: #E8E8E8;
-      margin: 1%;
-      border-radius: 3px;
-    }
-    .commit-description {
-      margin: 1%;
-      border-radius: 3px;
-      overflow: hidden;
-    }
-    ''', type="text/css")
+    doc.set_title('Chromium digest')
     with doc.body:
         with div(cls='main'):
-            h1('Chromium digest')
+            h1('Chromium digest', style=h1_style)
             for item in data:
-                with div(cls='commit'):
-                    with a(href=item['url'], target='_blank'):
-                        h2(item['head'], cls='commit-header')
-                    pre(item['commit_message'], cls='commit-description')
+                with div(style=commit_style):
+                    with a(href=item['url'] if 'url' in item else '',
+                           target='_blank'):
+                        h2(item['head'], style=commit_header_style)
+                    pre(item['commit_message'], style=commit_description_style)
     return str(doc)
 
 
 def parse_commit_info(info):
+    url = re.compile('Review-Url:\s+(https://\S+/\d+)')
     result = {'commit_message': info}
     for line in StringIO.StringIO(info):
         if line.startswith('commit'):
@@ -80,7 +58,9 @@ def parse_commit_info(info):
             if 'head' not in result:
                 result['head'] = line.strip()
             if 'url' not in result and line.startswith('    Review-Url:'):
-                result['url'] = line[len('    Review-Url:'):].strip()
+                match = url.search(line)
+                if match:
+                    result['url'] = match.group(1)
     return result
 
 
