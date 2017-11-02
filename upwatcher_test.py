@@ -35,3 +35,42 @@ Date:   Tue Jan 31 20:59:55 2017 -0800
                           'StringToVideoCodec'
     assert 'url' in result
     assert result['url'] == 'https://codereview.chromium.org/2659133003'
+
+
+def test_parse_commit_info_gerrit():
+    test_string = '''
+commit 08268de146718a0d96c0eaf79adf0dd3999ecf28
+Author: Dale Curtis <dalecurtis@chromium.org>
+Date:   Thu Nov 2 03:18:18 2017 +0000
+
+    IVFParser is only used by unit tests.
+    
+    So don't build it for all platforms and non-test targets.
+    
+    BUG=778369
+    TEST=none
+    
+    Cq-Include-Trybots: master.tryserver.chromium.android:android_optional_gpu_tests_rel;master.tryserver.chromium.linux:linux_optional_gpu_tests_rel;master.tryserver.chromium.mac:mac_optional_gpu_tests_rel;master.tryserver.chromium.win:win_optional_gpu_tests_rel
+    Change-Id: I106f2a909b27028fbc88a2fdf9dd850f97d5eb73
+    Reviewed-on: https://chromium-review.googlesource.com/738638
+    Commit-Queue: Dale Curtis <dalecurtis@chromium.org>
+    Reviewed-by: Miguel Casas <mcasas@chromium.org>
+    Cr-Commit-Position: refs/heads/master@{#513391}
+
+media/BUILD.gn
+media/base/BUILD.gn
+media/filters/BUILD.gn
+media/filters/ivf_parser.h
+    '''
+    result = uw.parse_commit_info(test_string)
+    assert result['commit_message'] == test_string
+    assert 'commit' in result
+    assert result['commit'] == '08268de146718a0d96c0eaf79adf0dd3999ecf28'
+    assert 'author' in result
+    assert result['author'] == 'Dale Curtis <dalecurtis@chromium.org>'
+    assert 'date' in result
+    assert result['date'] == 'Thu Nov 2 03:18:18 2017 +0000'
+    assert 'head' in result
+    assert result['head'] == 'IVFParser is only used by unit tests.'
+    assert 'url' in result
+    assert result['url'] == 'https://chromium-review.googlesource.com/738638'

@@ -45,7 +45,7 @@ def create_html_document(data):
 
 
 def parse_commit_info(info):
-    url = re.compile('Review-Url:\s+(https://\S+/\d+)')
+    url = re.compile(':\s+(https://\S+/\d+)')
     result = {'commit_message': info}
     for line in StringIO.StringIO(info):
         if line.startswith('commit'):
@@ -57,7 +57,8 @@ def parse_commit_info(info):
         elif line.startswith('    '):
             if 'head' not in result:
                 result['head'] = line.strip()
-            if 'url' not in result and line.startswith('    Review-Url:'):
+            if 'url' not in result and (line.startswith('    Review-Url:') or
+                                        line.startswith('    Reviewed-on:')):
                 match = url.search(line)
                 if match:
                     result['url'] = match.group(1)
